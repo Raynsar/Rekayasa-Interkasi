@@ -245,24 +245,52 @@ Catatan: target merupakan hipotesis awal yang perlu divalidasi.
 
 ---
 
-## Deployment (Vercel — 3 langkah)
+## Deployment (Vercel — 5 langkah)
 
-1. **Push ke `main`:** agent AI melakukan `git push origin main` sesuai izin
-   Phase 3; Anda juga dapat melakukannya manual dari root repository.
-2. **Import di Vercel:** buat New Project → Import repository
-   `Raynsar/Rekayasa-Interkasi` → set **Root Directory** ke `apps/web` →
-   Framework Preset **Vite** → Build Command `npm run build` → Output
-   Directory `dist`. File `apps/web/vercel.json` sudah menyiapkan SPA rewrite.
-3. **Deploy & catat URL:** klik **Deploy**, lalu salin URL publik yang
-   diberikan Vercel ke `CHANGELOG.md` (Phase 6) dan laporan akhir.
+Deployment dilakukan **manual oleh pemilik repo**. Agent AI hanya
+menyiapkan konfigurasi dan tidak menjalankan `vercel deploy`.
+
+Deployment: [URL Vercel diisi setelah deploy]
+
+1. **Login/daftar Vercel dengan akun GitHub.** Buka
+   [vercel.com](https://vercel.com), pilih **Continue with GitHub**, lalu
+   setujui akses Vercel ke akun GitHub Anda bila diminta.
+2. **Import repo.** Di dashboard Vercel pilih **Add New… → Project**, lalu
+   **Import** repository `Raynsar/Rekayasa-Interkasi`. Jika repo belum
+   muncul, klik **Adjust GitHub App Permissions** dan centang repo tersebut.
+3. **Konfigurasi proyek.** Isi pengaturan berikut persis:
+   - **Framework Preset:** `Vite`
+   - **Root Directory:** `apps/web` (klik **Edit** dan pilih folder ini)
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+   - **Install Command:** biarkan default (`npm install`)
+
+   File `apps/web/vercel.json` sudah berisi SPA rewrite
+   (`/(.*)` → `/index.html`), sehingga route seperti `/orders/o-1`
+   tidak 404 saat di-refresh. Tidak perlu variabel lingkungan untuk
+   demo ini.
+4. **Deploy.** Klik **Deploy** dan tunggu hingga build selesai. Panel
+   *Build Logs* harus menampilkan `tsc --noEmit && vite build` berhasil;
+   jika gagal, periksa bahwa Root Directory benar-benar `apps/web`.
+5. **Salin URL publik.** Setelah status *Ready*, salin URL yang diberikan
+   Vercel (format `https://<nama-proyek>.vercel.app`) dan kirim ke agent AI
+   untuk dicatat sebagai commit kecil terpisah di `CHANGELOG.md` bagian
+   `[Unreleased]`.
 
 > Tidak ada token/secret yang disimpan di repository. Variabel lingkungan,
 > bila diperlukan, ditambahkan langsung di dashboard Vercel oleh Anda.
 
 ## Validasi Visual
 
-Bukti tampilan Phase 3 pada tiga breakpoint (mobile 390px, tablet 768px,
-desktop 1440px) tersimpan di `docs/screenshots/`:
-`phase3-mobile.png`, `phase3-tablet.png`, dan `phase3-desktop.png`.
-File-file ini berada di root repo, bukan di `apps/web`, sehingga tidak ikut
-build atau deploy.
+Bukti tampilan tersimpan di `docs/screenshots/` (root repo, bukan di
+`apps/web`, sehingga tidak ikut build/deploy):
+
+- Phase 3 — `phase3-{mobile,tablet,desktop}.png` (390/768/1440px).
+- Phase 4 — `phase4-{mobile,tablet,desktop}.png` + `phase4-audit.json`.
+- Phase 5 — `phase5/` berisi 20 screenshot (10 route × 390px/1440px)
+  dan `audit.json` berisi hasil pemeriksaan DOM, gaya komputasi, dan
+  overflow horizontal.
+
+Hasil validasi Phase 5: 42/42 Acceptance Criteria Pass, 32/32 pemeriksaan
+runtime, dan 8/8 skenario manual. Detail ada di `CHANGELOG.md` rilis
+2.0.0 serta `docs/validation/phase5/`.
