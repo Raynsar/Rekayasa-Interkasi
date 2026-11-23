@@ -1,0 +1,102 @@
+/* Design tokens dari DESIGN-SYSTEM.md v2.0 — jangan hardcode nilai di komponen. */
+:root {
+  /* Primary */
+  --color-primary: #ee4d2d;
+  --color-primary-hover: #d73211;
+  --color-primary-light: #fff1ed;
+  --color-primary-dark: #b72709;
+
+  /* Neutral */
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-surface-secondary: #fafafa;
+  --color-border: #e5e5e5;
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+  --color-text-muted: #bdbdbd;
+
+  /* Semantic */
+  --color-success: #2e7d32;
+  --color-success-light: #e8f5e9;
+  --color-warning: #f57c00;
+  --color-warning-light: #fff3e0;
+  --color-danger: #d32f2f;
+  --color-danger-light: #fdecea;
+  --color-info: #1976d2;
+  --color-info-light: #e3f2fd;
+
+  /* Status — selalu pasangkan dengan label teks */
+  --status-belum-bayar-text: #757575;
+  --status-belum-bayar-bg: #fafafa;
+  --status-dikemas-text: #1976d2;
+  --status-dikemas-bg: #e3f2fd;
+  --status-dikirim-text: #ee4d2d;
+  --status-dikirim-bg: #fff1ed;
+  --status-diterima-text: #2e7d32;
+  --status-diterima-bg: #e8f5e9;
+  --status-selesai-text: #2e7d32;
+  --status-selesai-bg: #e8f5e9;
+  --status-dibatalkan-text: #d32f2f;
+  --status-dibatalkan-bg: #fdecea;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, sans-serif;
+  --font-display: 700 32px/1.2 var(--font-family);
+  --font-h1: 700 28px/1.2 var(--font-family);
+  --font-h2: 600 22px/1.3 var(--font-family);
+  --font-h3: 600 18px/1.4 var(--font-family);
+  --font-body-large: 400 16px/1.5 var(--font-family);
+  --font-body: 400 14px/1.5 var(--font-family);
+  --font-body-small: 400 13px/1.5 var(--font-family);
+  --font-caption: 400 12px/1.4 var(--font-family);
+
+  /* Spacing — kelipatan 4px */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --content-max-width: 1440px;
+
+  /* Touch target */
+  --touch-target-min: 44px;
+
+  /* Breakpoint (referensi; dipakai di media query) */
+  --breakpoint-tablet: 640px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1440px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font: var(--font-body);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
