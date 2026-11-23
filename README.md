@@ -250,7 +250,7 @@ Catatan: target merupakan hipotesis awal yang perlu divalidasi.
 Deployment dilakukan **manual oleh pemilik repo**. Agent AI hanya
 menyiapkan konfigurasi dan tidak menjalankan `vercel deploy`.
 
-Deployment: [URL Vercel diisi setelah deploy]
+Deployment: https://rekayasa-interkasi-mocha.vercel.app/
 
 1. **Login/daftar Vercel dengan akun GitHub.** Buka
    [vercel.com](https://vercel.com), pilih **Continue with GitHub**, lalu

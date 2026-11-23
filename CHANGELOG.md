@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Pending
-- Deployment: [URL Vercel diisi setelah deploy]
+- Deployment: https://rekayasa-interkasi-mocha.vercel.app/
 
 > Setelah deploy manual, URL publik dicatat pada commit kecil terpisah di
 > baris ini. Belum ada perubahan fungsional yang direncanakan di Unreleased.
