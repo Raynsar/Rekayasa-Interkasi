@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell } from 'lucide-react'
+import { AlertCircle, Bell, RotateCcw } from 'lucide-react'
 
 export interface NotificationItem {
   id: string
@@ -7,14 +7,17 @@ export interface NotificationItem {
   title: string
   description: string
   tone: 'warning' | 'info'
+  failed?: boolean
+  reason?: string
 }
 
 interface Props {
   items: NotificationItem[]
   onSelect: (orderId: string) => void
+  onRetry?: (id: string) => void
 }
 
-export default function NotificationBell({ items, onSelect }: Props) {
+export default function NotificationBell({ items, onSelect, onRetry }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -37,18 +40,36 @@ export default function NotificationBell({ items, onSelect }: Props) {
             <p className="muted">Tidak ada notifikasi baru.</p>
           ) : (
             items.map((item) => (
-              <button
-                type="button"
-                className={`notification-item tone-${item.tone}`}
+              <div
+                className={`notification-item tone-${item.tone}${item.failed ? ' delivery-failed' : ''}`}
                 key={item.id}
-                onClick={() => {
-                  onSelect(item.orderId)
-                  setOpen(false)
-                }}
               >
-                <strong>{item.title}</strong>
-                <span>{item.description}</span>
-              </button>
+                <button
+                  type="button"
+                  className="notification-open"
+                  onClick={() => {
+                    onSelect(item.orderId)
+                    setOpen(false)
+                  }}
+                >
+                  <strong>{item.title}</strong>
+                  <span>{item.description}</span>
+                </button>
+                {item.failed && (
+                  <div className="notification-failure">
+                    <span>
+                      <AlertCircle size={14} aria-hidden="true" />
+                      Gagal dicatat: {item.reason ?? 'tidak diketahui'}
+                    </span>
+                    {onRetry && (
+                      <button type="button" onClick={() => onRetry(item.id)}>
+                        <RotateCcw size={14} aria-hidden="true" />
+                        Coba lagi
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             ))
           )}
         </div>

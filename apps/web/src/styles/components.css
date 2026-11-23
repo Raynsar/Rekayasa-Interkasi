@@ -185,6 +185,11 @@
   color: var(--color-info);
 }
 
+.banner-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
 .banner-copy {
   flex: 1;
   min-width: 0;
@@ -328,22 +333,62 @@
 }
 
 .notification-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
   width: 100%;
   padding: var(--space-3);
   margin-bottom: var(--space-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-secondary);
-  text-align: left;
-  cursor: pointer;
   font: var(--font-body-small);
 }
 
 .notification-item.tone-warning { border-left: 4px solid var(--color-warning); }
 .notification-item.tone-info { border-left: 4px solid var(--color-info); }
+.notification-item.delivery-failed { border-color: var(--color-danger); }
+
+.notification-open {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: var(--font-body-small);
+  color: var(--color-text-primary);
+}
+
+.notification-failure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font: var(--font-caption);
+  color: var(--color-danger);
+}
+
+.notification-failure span,
+.notification-failure button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.notification-failure button {
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  cursor: pointer;
+}
 
 @media (min-width: 1024px) {
   .toast-container {

@@ -81,6 +81,15 @@ export default function OrderDetailPage({
           </div>
         </div>
       )}
+      {order.autoCompleted && (
+        <div className="banner banner-success" role="status">
+          <CheckCircle2 size={20} aria-hidden="true" />
+          <div className="banner-copy">
+            <strong>Selesai otomatis sesuai pilihan Anda</strong>
+            <p>Diselesaikan pada {formatDateTime(order.completedAt ?? order.createdAt)}.</p>
+          </div>
+        </div>
+      )}
 
       <div className="detail-layout">
         <div className="detail-main">

@@ -8,10 +8,12 @@ import type { ReportDraft } from '../types/report'
 
 interface Props {
   orders: Order[]
+  draft: ReportDraft
+  onChange: (patch: Partial<ReportDraft>) => void
   onSubmit: (orderId: string, draft: ReportDraft) => void
 }
 
-export default function ReportPage({ orders, onSubmit }: Props) {
+export default function ReportPage({ orders, draft, onChange, onSubmit }: Props) {
   const { id } = useParams()
   const navigate = useNavigate()
   const order = orders.find((candidate) => candidate.id === id)
@@ -52,8 +54,10 @@ export default function ReportPage({ orders, onSubmit }: Props) {
         <section className="panel report-panel">
           <ReportForm
             order={order}
+            draft={draft}
+            onChange={onChange}
             onCancel={() => navigate(`/orders/${order.id}`)}
-            onSubmit={(draft) => onSubmit(order.id, draft)}
+            onSubmit={(value) => onSubmit(order.id, value)}
           />
         </section>
       )}

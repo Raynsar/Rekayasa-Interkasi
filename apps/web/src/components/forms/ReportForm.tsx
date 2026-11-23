@@ -17,7 +17,7 @@ const CATEGORIES = [
 const MAX_DESCRIPTION = 1000
 const MAX_EVIDENCE_BYTES = 5 * 1024 * 1024
 
-function defaultCategory(status: OrderStatus): string {
+export function defaultCategory(status: OrderStatus): string {
   switch (status) {
     case 'Dikirim':
     case 'Diterima':
@@ -33,6 +33,15 @@ function defaultCategory(status: OrderStatus): string {
   }
 }
 
+export function emptyDraft(order: Order): ReportDraft {
+  return {
+    category: defaultCategory(order.status),
+    description: '',
+    evidenceName: '',
+    evidenceSize: undefined,
+  }
+}
+
 interface Errors {
   category?: string
   description?: string
@@ -41,32 +50,30 @@ interface Errors {
 
 interface Props {
   order: Order
+  draft: ReportDraft
+  onChange: (patch: Partial<ReportDraft>) => void
   onSubmit: (draft: ReportDraft) => void
   onCancel: () => void
 }
 
-export default function ReportForm({ order, onSubmit, onCancel }: Props) {
-  const [category, setCategory] = useState(defaultCategory(order.status))
-  const [description, setDescription] = useState('')
-  const [evidenceName, setEvidenceName] = useState('')
-  const [evidenceSize, setEvidenceSize] = useState<number | undefined>()
+export default function ReportForm({ order, draft, onChange, onSubmit, onCancel }: Props) {
   const [errors, setErrors] = useState<Errors>({})
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextErrors: Errors = {}
 
-    if (!category) nextErrors.category = 'Kategori wajib dipilih.'
-    if (!description.trim()) nextErrors.description = 'Deskripsi wajib diisi.'
-    else if (description.length > MAX_DESCRIPTION)
+    if (!draft.category) nextErrors.category = 'Kategori wajib dipilih.'
+    if (!draft.description.trim()) nextErrors.description = 'Deskripsi wajib diisi.'
+    else if (draft.description.length > MAX_DESCRIPTION)
       nextErrors.description = `Deskripsi maksimal ${MAX_DESCRIPTION} karakter.`
-    if (evidenceSize !== undefined && evidenceSize > MAX_EVIDENCE_BYTES)
+    if (draft.evidenceSize !== undefined && draft.evidenceSize > MAX_EVIDENCE_BYTES)
       nextErrors.evidence = 'Ukuran bukti maksimal 5MB.'
 
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
-    onSubmit({ category, description: description.trim(), evidenceName, evidenceSize })
+    onSubmit({ ...draft, description: draft.description.trim() })
   }
 
   return (
@@ -85,8 +92,11 @@ export default function ReportForm({ order, onSubmit, onCancel }: Props) {
         <label htmlFor="report-category">Kategori masalah</label>
         <select
           id="report-category"
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
+          value={draft.category}
+          onChange={(event) => {
+            onChange({ category: event.target.value })
+            setErrors((current) => ({ ...current, category: undefined }))
+          }}
           aria-invalid={Boolean(errors.category)}
         >
           {CATEGORIES.map((option) => (
@@ -104,8 +114,11 @@ export default function ReportForm({ order, onSubmit, onCancel }: Props) {
           id="report-description"
           rows={5}
           maxLength={MAX_DESCRIPTION}
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
+          value={draft.description}
+          onChange={(event) => {
+            onChange({ description: event.target.value })
+            setErrors((current) => ({ ...current, description: undefined }))
+          }}
           placeholder="Jelaskan masalah yang Anda alami..."
           aria-invalid={Boolean(errors.description)}
         />
@@ -116,7 +129,7 @@ export default function ReportForm({ order, onSubmit, onCancel }: Props) {
             <span>Wajib diisi</span>
           )}
           <span>
-            {description.length}/{MAX_DESCRIPTION}
+            {draft.description.length}/{MAX_DESCRIPTION}
           </span>
         </div>
       </div>
@@ -125,7 +138,7 @@ export default function ReportForm({ order, onSubmit, onCancel }: Props) {
         <label htmlFor="report-evidence">Bukti (opsional)</label>
         <label className="file-picker" htmlFor="report-evidence">
           <Paperclip size={18} aria-hidden="true" />
-          {evidenceName || 'Pilih gambar atau dokumen'}
+          {draft.evidenceName || 'Pilih gambar atau dokumen'}
         </label>
         <input
           id="report-evidence"
@@ -133,14 +146,14 @@ export default function ReportForm({ order, onSubmit, onCancel }: Props) {
           accept="image/*,.pdf"
           onChange={(event) => {
             const file = event.target.files?.[0]
-            setEvidenceName(file?.name ?? '')
-            setEvidenceSize(file?.size)
+            onChange({ evidenceName: file?.name ?? '', evidenceSize: file?.size })
+            setErrors((current) => ({ ...current, evidence: undefined }))
           }}
         />
         {errors.evidence ? (
           <span className="field-error">{errors.evidence}</span>
         ) : (
-          <span className="field-hint">Maksimal 5MB</span>
+          <span className="field-hint">Maksimal 5MB · hanya nama & ukuran file yang disimpan</span>
         )}
       </div>
 

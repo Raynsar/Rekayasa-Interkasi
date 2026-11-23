@@ -8,9 +8,15 @@ interface Props {
   children: ReactNode
   notifications: NotificationItem[]
   onNotificationSelect: (orderId: string) => void
+  onNotificationRetry: (id: string) => void
 }
 
-export default function AppShell({ children, notifications, onNotificationSelect }: Props) {
+export default function AppShell({
+  children,
+  notifications,
+  onNotificationSelect,
+  onNotificationRetry,
+}: Props) {
   return (
     <div className="app-shell">
       <Sidebar />
@@ -20,7 +26,11 @@ export default function AppShell({ children, notifications, onNotificationSelect
             <span className="topbar-brand">BelanjaKu</span>
             <span className="topbar-subtitle">Pelacakan pesanan</span>
           </div>
-          <NotificationBell items={notifications} onSelect={onNotificationSelect} />
+          <NotificationBell
+            items={notifications}
+            onSelect={onNotificationSelect}
+            onRetry={onNotificationRetry}
+          />
         </header>
         <main className="app-content">{children}</main>
       </div>

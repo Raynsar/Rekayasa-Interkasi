@@ -1,5 +1,6 @@
 import type { Order, OrderItem, Product } from '../types/order'
 import { computePriceBreakdown } from '../utils/price'
+import { readPriceOverrides } from './priceOverrides'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const HOUR_MS = 60 * 60 * 1000
@@ -72,8 +73,19 @@ export const PRODUCTS: Product[] = [
   },
 ]
 
+/** Katalog dengan harga terbaru; dipakai semua halaman agar angka identik. */
+export function getProducts(): Product[] {
+  const overrides = readPriceOverrides()
+  return PRODUCTS.map((product) =>
+    overrides[product.id] === undefined ? product : { ...product, price: overrides[product.id] },
+  )
+}
+
 export function findProduct(id: string): Product | undefined {
-  return PRODUCTS.find((product) => product.id === id)
+  const product = PRODUCTS.find((candidate) => candidate.id === id)
+  if (!product) return undefined
+  const price = readPriceOverrides()[id]
+  return price === undefined ? product : { ...product, price }
 }
 
 function makeItem(productId: string, quantity = 1): OrderItem {

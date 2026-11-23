@@ -98,6 +98,8 @@ export interface Order {
   estimateEnd: string
   autoCompleteAt?: string
   autoOptIn: boolean
+  completedAt?: string
+  autoCompleted?: boolean
   shipmentEvents: ShipmentEvent[]
   address: string
   courier: string

@@ -46,6 +46,17 @@ File yang diminta pada Phase 2: `README.md`, `INTERACTION-SPEC.md`, revisi
 | D-26 | Agent diizinkan `git commit` & `git push` ke `origin/main` mulai Phase 3; aturan "jangan push" Phase 1 dicabut | Jawaban Phase 3 | **Tetap dilarang:** `vercel deploy`, force push, dan menyimpan token/secret di source |
 | D-27 | Strategi commit: **satu commit per fase** dengan Conventional Commits berbahasa Inggris | Jawaban Phase 3 | `chore(phase2): …`, `feat(phase3): …`, dst. |
 
+## 2b. Keputusan Phase 4 (teknis — tanpa dampak produk)
+
+| ID | Keputusan | Alasan |
+|---|---|---|
+| D-28 | `usePersistentState` menulis ke `localStorage` **sebelum** state UI berubah; bila gagal, state lama dipertahankan + toast error. Semua kunci diawali `belanjaku:v2:` | Memenuhi AC-029/AC-036/AC-039 ("kembalikan status sebelumnya") dan menghindari tabrakan kunci (AC-037) |
+| D-29 | Notifikasi **diturunkan** dari data pesanan (bukan disalin) dengan ID unik `${orderId}:${kind}`; pengiriman & kegagalan dicatat terpisah, data pesanan tidak diubah saat gagal | Anti-duplikat (AC-020) + pencatatan kegagalan (AC-021) tanpa efek samping |
+| D-30 | Batas frekuensi iklan: maksimal **3 tayangan/hari** + **cooldown 24 jam** setelah ditutup, keduanya persisten | Mengimplementasikan "batas frekuensi" (AC-014–AC-017/AC-034) dengan nilai wajar; tidak mengubah alur tutup 1 ketukan |
+| D-31 | Nomor tiket berbentuk `TKT-YYYY-NNNNNN` dari counter monoton yang dipersistenkan | Unik & urut tanpa backend (AC-022–AC-024) |
+| D-32 | Auto-selesai dievaluasi tiap 30 detik + guard `completingRef` per order | Mencegah duplikasi eksekusi (AC-009) tanpa mengubah aturan opt-in D-06 |
+| D-33 | Override harga dipersistenkan agar pesan "harga diperbarui" tetap muncul setelah reload | Konsistensi harga beranda→checkout (AC-001/AC-040) |
+
 ## 3. Konflik yang dicatat (tidak dihapus)
 
 1. **FR-02 vs prompt/AC-007:** PRD lama melarang auto-selesai tanpa konfirmasi,

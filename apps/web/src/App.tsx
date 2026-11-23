@@ -1,8 +1,13 @@
-import { useMemo, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { useCallback, useMemo, useRef } from 'react'
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
 import ToastContainer from './components/feedback/ToastContainer'
 import type { NotificationItem } from './components/navigation/NotificationBell'
+import { emptyDraft } from './components/forms/ReportForm'
+import { useAdFrequency } from './hooks/useAdFrequency'
+import { useAutoComplete } from './hooks/useAutoComplete'
+import { useNotifications } from './hooks/useNotifications'
+import { usePersistentState } from './hooks/usePersistentState'
 import { useToasts } from './hooks/useToasts'
 import AccountPage from './pages/AccountPage'
 import CartPage from './pages/CartPage'
@@ -14,54 +19,156 @@ import OrdersPage from './pages/OrdersPage'
 import ProductPage from './pages/ProductPage'
 import ReportPage from './pages/ReportPage'
 import { findProduct, getSeedOrders } from './services/seedData'
+import { isCartArray, isDraftMap, isNumber, isOrderArray } from './services/validators'
 import type { CartLine } from './types/cart'
 import type { Order, OrderItem } from './types/order'
 import type { ReportDraft } from './types/report'
-import { isDelayed, isReminderDue } from './utils/datetime'
 import { combineBreakdowns, computePriceBreakdown } from './utils/price'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const DELIVERY_ADDRESS = 'Jl. Teknik No. 12, Surabaya, Jawa Timur 60115'
 
-function cartItems(cart: CartLine[]): { line: CartLine; product: NonNullable<ReturnType<typeof findProduct>> }[] {
-  return cart.flatMap((line) => {
-    const product = findProduct(line.productId)
-    return product ? [{ line, product }] : []
-  })
+function emptyFallbackDraft(): ReportDraft {
+  return { category: '', description: '' }
+}
+
+interface ReportRouteProps {
+  orders: Order[]
+  drafts: Record<string, ReportDraft>
+  onChange: (orderId: string, patch: Partial<ReportDraft>) => void
+  onSubmit: (orderId: string, draft: ReportDraft) => void
+}
+
+function ReportRoute({ orders, drafts, onChange, onSubmit }: ReportRouteProps) {
+  const { id } = useParams()
+  const orderId = id ?? ''
+  const order = orders.find((candidate) => candidate.id === orderId)
+  const draft = drafts[orderId] ?? (order ? emptyDraft(order) : emptyFallbackDraft())
+
+  return (
+    <ReportPage
+      orders={orders}
+      draft={draft}
+      onChange={(patch) => onChange(orderId, patch)}
+      onSubmit={onSubmit}
+    />
+  )
 }
 
 export default function App() {
   const navigate = useNavigate()
-  const [orders, setOrders] = useState<Order[]>(getSeedOrders)
-  const [cart, setCart] = useState<CartLine[]>([])
-  const [showAds, setShowAds] = useState(true)
-  const [notifyDelay, setNotifyDelay] = useState(true)
   const { toasts, push, dismiss } = useToasts()
+  const handleStorageError = useCallback((message: string) => push(message, 'error'), [push])
 
-  const notifications = useMemo<NotificationItem[]>(() => {
-    const items: NotificationItem[] = []
-    for (const order of orders) {
-      if (notifyDelay && isDelayed(order)) {
-        items.push({
-          id: `${order.id}-delay`,
-          orderId: order.id,
-          title: `Keterlambatan ${order.invoice}`,
-          description: 'Estimasi terlampaui. Lihat langkah berikutnya di detail pesanan.',
-          tone: 'warning',
-        })
+  const [orders, setOrders] = usePersistentState<Order[]>(
+    'orders',
+    getSeedOrders,
+    handleStorageError,
+    isOrderArray,
+  )
+  const [cart, setCart] = usePersistentState<CartLine[]>(
+    'cart',
+    [],
+    handleStorageError,
+    isCartArray,
+  )
+  const [showAds, setShowAds] = usePersistentState<boolean>(
+    'show-ads',
+    true,
+    handleStorageError,
+  )
+  const [notifyDelay, setNotifyDelay] = usePersistentState<boolean>(
+    'notify-delay',
+    true,
+    handleStorageError,
+  )
+  const [drafts, setDrafts] = usePersistentState<Record<string, ReportDraft>>(
+    'report-drafts',
+    {},
+    handleStorageError,
+    isDraftMap,
+  )
+  const [ticketCounter, setTicketCounter] = usePersistentState<number>(
+    'ticket-counter',
+    0,
+    handleStorageError,
+    isNumber,
+  )
+
+  const { visible: adVisible, dismiss: dismissAd } = useAdFrequency(handleStorageError)
+  const { notifications, retry } = useNotifications({
+    orders,
+    notifyDelay,
+    onError: handleStorageError,
+    push,
+  })
+
+  const completingRef = useRef<Set<string>>(new Set())
+
+  const completeOrder = useCallback(
+    (orderId: string, automatic = false): boolean => {
+      if (completingRef.current.has(orderId)) return false
+      const target = orders.find((order) => order.id === orderId)
+      if (!target || target.status !== 'Diterima') {
+        if (!automatic) push('Pesanan tidak dapat diselesaikan pada status ini.', 'error')
+        return false
       }
-      if (isReminderDue(order)) {
-        items.push({
-          id: `${order.id}-reminder`,
-          orderId: order.id,
-          title: `Pengingat ${order.invoice}`,
-          description: 'Pesanan akan selesai otomatis dalam 24 jam.',
-          tone: 'info',
-        })
+
+      completingRef.current.add(orderId)
+      try {
+        const completedAt = new Date().toISOString()
+        // Tulis gagal => state tidak berubah (AC-039) dan toast error sudah
+        // dipancarkan oleh handleStorageError.
+        const saved = setOrders((current) =>
+          current.map((order) =>
+            order.id === orderId
+              ? {
+                  ...order,
+                  status: 'Selesai',
+                  completedAt,
+                  autoCompleted: automatic,
+                  autoOptIn: false,
+                }
+              : order,
+          ),
+        )
+        if (!saved) return false
+
+        push(
+          automatic
+            ? 'Pesanan diselesaikan otomatis sesuai pilihan Anda.'
+            : 'Pesanan selesai. Cicilan SPayLater dapat dibayar.',
+          'success',
+        )
+        return true
+      } finally {
+        completingRef.current.delete(orderId)
       }
-    }
-    return items
-  }, [orders, notifyDelay])
+    },
+    [orders, push, setOrders],
+  )
+
+  const handleAutoComplete = useCallback(
+    (orderId: string) => {
+      completeOrder(orderId, true)
+    },
+    [completeOrder],
+  )
+  useAutoComplete({ orders, onDue: handleAutoComplete })
+
+  const bellNotifications = useMemo<NotificationItem[]>(
+    () =>
+      notifications.map((item) => ({
+        id: item.id,
+        orderId: item.orderId,
+        title: item.title,
+        description: item.description,
+        tone: item.type === 'delay' ? 'warning' : 'info',
+        failed: item.failed,
+        reason: item.reason,
+      })),
+    [notifications],
+  )
 
   function addToCart(productId: string) {
     const product = findProduct(productId)
@@ -92,17 +199,20 @@ export default function App() {
   }
 
   function placeOrder(paymentMethod: string) {
-    const items = cartItems(cart)
-    if (items.length === 0) {
+    const priced = cart.flatMap((line) => {
+      const product = findProduct(line.productId)
+      return product ? [{ line, product }] : []
+    })
+    if (priced.length === 0) {
       push('Keranjang kosong. Tambahkan produk terlebih dahulu.', 'error')
       return
     }
 
     const breakdown = combineBreakdowns(
-      items.map(({ product, line }) => computePriceBreakdown({ product, quantity: line.quantity })),
+      priced.map(({ product, line }) => computePriceBreakdown({ product, quantity: line.quantity })),
     )
     const now = Date.now()
-    const orderItems: OrderItem[] = items.map(({ product, line }) => ({
+    const orderItems: OrderItem[] = priced.map(({ product, line }) => ({
       productId: product.id,
       name: product.name,
       quantity: line.quantity,
@@ -127,30 +237,22 @@ export default function App() {
       paymentMethod,
     }
 
-    setOrders((current) => [order, ...current])
-    setCart([])
+    if (!setOrders((current) => [order, ...current])) return
+    if (!setCart([])) {
+      setOrders((current) => current.filter((candidate) => candidate.id !== order.id))
+      push('Gagal menyimpan keranjang. Pesanan dibatalkan.', 'error')
+      return
+    }
+
     push('Pesanan berhasil dibuat', 'success')
     navigate(`/orders/${order.id}`)
   }
 
-  function completeOrder(orderId: string) {
-    const target = orders.find((order) => order.id === orderId)
-    if (!target || target.status !== 'Diterima') {
-      push('Pesanan tidak dapat diselesaikan pada status ini.', 'error')
-      return
-    }
-    setOrders((current) =>
-      current.map((order) =>
-        order.id === orderId ? { ...order, status: 'Selesai', autoOptIn: false } : order,
-      ),
-    )
-    push('Pesanan selesai. Cicilan SPayLater dapat dibayar.', 'success')
-  }
-
   function setAutoOptIn(orderId: string, value: boolean) {
-    setOrders((current) =>
+    const saved = setOrders((current) =>
       current.map((order) => (order.id === orderId ? { ...order, autoOptIn: value } : order)),
     )
+    if (!saved) return
     push(
       value
         ? 'Anda memilih tunggu otomatis sampai batas waktu.'
@@ -160,24 +262,46 @@ export default function App() {
   }
 
   function payInstallment(orderId: string) {
-    setOrders((current) =>
+    if (!setOrders((current) =>
       current.map((order) =>
         order.id === orderId ? { ...order, installmentRemaining: 0 } : order,
       ),
-    )
+    )) return
     push('Pelunasan cicilan dicatat.', 'success')
   }
 
+  function updateReportDraft(orderId: string, patch: Partial<ReportDraft>) {
+    const order = orders.find((candidate) => candidate.id === orderId)
+    const base = order ? emptyDraft(order) : emptyFallbackDraft()
+    setDrafts((current) => ({
+      ...current,
+      [orderId]: { ...base, ...current[orderId], ...patch },
+    }))
+  }
+
   function submitReport(orderId: string, draft: ReportDraft) {
-    const ticket = `TKT-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`
-    const createdAt = new Date().toISOString()
-    setOrders((current) =>
+    const nextCounter = ticketCounter + 1
+    if (!setTicketCounter(nextCounter)) return
+
+    const ticket = `TKT-${new Date().getFullYear()}-${String(nextCounter).padStart(6, '0')}`
+    const saved = setOrders((current) =>
       current.map((order) =>
         order.id === orderId
-          ? { ...order, reportTicket: ticket, report: { ...draft, createdAt } }
+          ? {
+              ...order,
+              reportTicket: ticket,
+              report: { ...draft, createdAt: new Date().toISOString() },
+            }
           : order,
       ),
     )
+    if (!saved) return
+
+    setDrafts((current) => {
+      const next = { ...current }
+      delete next[orderId]
+      return next
+    })
     push(`Laporan terkirim · ${ticket}`, 'success')
     navigate(`/orders/${orderId}`)
   }
@@ -185,8 +309,9 @@ export default function App() {
   return (
     <>
       <AppShell
-        notifications={notifications}
+        notifications={bellNotifications}
         onNotificationSelect={(orderId) => navigate(`/orders/${orderId}`)}
+        onNotificationRetry={retry}
       >
         <Routes>
           <Route
@@ -194,8 +319,8 @@ export default function App() {
             element={
               <HomePage
                 onAddToCart={addToCart}
-                adDismissed={!showAds}
-                onDismissAd={() => setShowAds(false)}
+                adDismissed={!showAds || !adVisible}
+                onDismissAd={dismissAd}
               />
             }
           />
@@ -225,7 +350,14 @@ export default function App() {
           />
           <Route
             path="/orders/:id/report"
-            element={<ReportPage orders={orders} onSubmit={submitReport} />}
+            element={
+              <ReportRoute
+                orders={orders}
+                drafts={drafts}
+                onChange={updateReportDraft}
+                onSubmit={submitReport}
+              />
+            }
           />
           <Route
             path="/account"

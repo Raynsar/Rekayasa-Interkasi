@@ -3,7 +3,7 @@ import { Plus, Star } from 'lucide-react'
 import AdBanner from '../components/ads/AdBanner'
 import PageHeader from '../components/layout/PageHeader'
 import ProductThumb from '../components/ProductThumb'
-import { PRODUCTS } from '../services/seedData'
+import { getProducts } from '../services/seedData'
 import { computePriceBreakdown } from '../utils/price'
 import { formatRupiah } from '../utils/format'
 
@@ -24,7 +24,7 @@ export default function HomePage({ onAddToCart, adDismissed, onDismissAd }: Prop
       {!adDismissed && <AdBanner onClose={onDismissAd} />}
 
       <section className="product-grid" aria-label="Daftar produk">
-        {PRODUCTS.map((product) => {
+        {getProducts().map((product) => {
           const finalPrice = computePriceBreakdown({ product, quantity: 1 }).total
           return (
             <article className="product-card" key={product.id}>

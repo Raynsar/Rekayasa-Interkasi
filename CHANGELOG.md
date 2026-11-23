@@ -65,6 +65,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ditandai Pass** — status Pass/Fail diberikan di Phase 5 setelah pengujian
   fungsional.
 
+### Phase 4 — Fungsi (2026-11-23)
+- Persistensi `localStorage` melalui `services/storage.ts` + hook
+  `usePersistentState`: `orders`, `cart`, `show-ads`, `notify-delay`,
+  `report-drafts`, `ticket-counter`, `ad-frequency`, `notification-deliveries`.
+  Penulisan terjadi **sebelum** perubahan state; bila gagal, state lama
+  dipertahankan dan toast error tampil (AC-029/AC-036/AC-039).
+- `useAutoComplete`: auto-selesai **hanya** untuk pesanan yang pengguna pilih
+  "Tunggu Otomatis" dan batas 24 jam sudah terlewat; tanpa opt-in tidak ada
+  auto-selesai. Guard `completingRef` mencegah duplikasi (AC-007/AC-009).
+- Sinkronisasi status: satu sumber state pesanan dipakai daftar, detail,
+  notifikasi, dan keranjang; perubahan langsung terlihat di semua halaman.
+- `services/notifications.ts` + `useNotifications`: notifikasi diturunkan
+  dari pesanan dengan ID unik `${orderId}:${kind}` sehingga tidak duplikat;
+  pengiriman & kegagalan dicatat, panel notifikasi menyediakan tombol
+  "Coba lagi", dan data pesanan tidak berubah saat gagal (AC-019–AC-021).
+- `useAdFrequency`: maksimal 3 tayangan/hari + cooldown 24 jam setelah
+  ditutup; tombol tutup tetap 1 ketukan dan ≥44×44px (AC-014–AC-017/AC-034).
+- Pelaporan masalah final: draft per pesanan tersimpan otomatis, validasi
+  per field, nomor tiket monoton `TKT-YYYY-NNNNNN`, serta lampiran otomatis
+  berupa ID/status pesanan. Bukti hanya menyimpan nama & ukuran file, bukan
+  isinya (AC-022–AC-024/AC-037).
+- `services/priceOverrides.ts`: perubahan harga bertahan setelah reload;
+  checkout menampilkan "harga diperbarui" bila harga berubah sejak item
+  masuk keranjang (AC-001/AC-040).
+- Verifikasi runtime headless Chrome: **12/12 skenario lolos** — kunci
+  localStorage, anti-duplikat notifikasi, selesaikan manual + persistensi,
+  tanpa/sertaan opt-in auto-selesai, cooldown iklan, draft & tiket laporan,
+  harga diperbarui, dan sinkronisasi status.
+- AC yang mulai teruji: AC-001, AC-004–AC-010, AC-014–AC-024, AC-029,
+  AC-036–AC-037, AC-039–AC-040. **Belum ada yang ditandai Pass** — keputusan
+  Pass/Fail diambil di Phase 5 dengan bukti pengujian.
+
 ## [2.0.0] - 2026-11-23
 
 ### Added
