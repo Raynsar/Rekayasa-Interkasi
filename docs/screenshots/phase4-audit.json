@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-11-23T15:58:34.122Z",
+  "manifest": [
+    {
+      "viewport": "mobile",
+      "width": 390,
+      "file": "phase4-mobile.png",
+      "heading": true,
+      "statusBadges": 7,
+      "filterTabs": 6,
+      "overflow": -15
+    },
+    {
+      "viewport": "tablet",
+      "width": 768,
+      "file": "phase4-tablet.png",
+      "heading": true,
+      "statusBadges": 7,
+      "filterTabs": 6,
+      "overflow": -15
+    },
+    {
+      "viewport": "desktop",
+      "width": 1440,
+      "file": "phase4-desktop.png",
+      "heading": true,
+      "statusBadges": 7,
+      "filterTabs": 6,
+      "overflow": -15
+    }
+  ]
+}

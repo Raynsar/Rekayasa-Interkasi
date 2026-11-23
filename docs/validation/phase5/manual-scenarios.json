@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-11-23T16:07:58.223Z",
+  "results": [
+    {
+      "ac": "AC-005",
+      "name": "Detail → Selesaikan → konfirmasi → status berubah",
+      "status": "Pass",
+      "detail": "klik=true/true status=Selesai lunasi=true"
+    },
+    {
+      "ac": "AC-006",
+      "name": "Batal di modal → status tetap",
+      "status": "Pass",
+      "detail": "klik=true/true status=Diterima"
+    },
+    {
+      "ac": "AC-036",
+      "name": "Reload detail Selesai → tetap Selesai",
+      "status": "Pass",
+      "detail": "status=Selesai"
+    },
+    {
+      "ac": "AC-017",
+      "name": "Tutup iklan → reload → tidak muncul 24 jam",
+      "status": "Pass",
+      "detail": "awal=true klik=true setelah=false reload=false"
+    },
+    {
+      "ac": "AC-022",
+      "name": "Laporan valid → nomor tiket, draft terhapus",
+      "status": "Pass",
+      "detail": "draft=true tiket=TKT-2026-000001 draftHapus=true"
+    },
+    {
+      "ac": "AC-024",
+      "name": "Tanpa deskripsi → ditolak dengan pesan",
+      "status": "Pass",
+      "detail": "pesan=true tanpaTiket=true"
+    },
+    {
+      "ac": "AC-039",
+      "name": "Tulis gagal → status lama dipertahankan + toast error",
+      "status": "Pass",
+      "detail": "klik=true/true status=Diterima toast=true"
+    },
+    {
+      "ac": "AC-037",
+      "name": "Clear storage → data user sebelumnya tidak bocor",
+      "status": "Pass",
+      "detail": "sebelum=TKT-USER-A-000001 sesudah=null"
+    }
+  ]
+}

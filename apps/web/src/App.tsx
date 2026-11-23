@@ -18,6 +18,7 @@ import OrderDetailPage from './pages/OrderDetailPage'
 import OrdersPage from './pages/OrdersPage'
 import ProductPage from './pages/ProductPage'
 import ReportPage from './pages/ReportPage'
+import { generateTicketNumber } from './services/ticket'
 import { findProduct, getSeedOrders } from './services/seedData'
 import { isCartArray, isDraftMap, isNumber, isOrderArray } from './services/validators'
 import type { CartLine } from './types/cart'
@@ -115,35 +116,36 @@ export default function App() {
       }
 
       completingRef.current.add(orderId)
-      try {
-        const completedAt = new Date().toISOString()
-        // Tulis gagal => state tidak berubah (AC-039) dan toast error sudah
-        // dipancarkan oleh handleStorageError.
-        const saved = setOrders((current) =>
-          current.map((order) =>
-            order.id === orderId
-              ? {
-                  ...order,
-                  status: 'Selesai',
-                  completedAt,
-                  autoCompleted: automatic,
-                  autoOptIn: false,
-                }
-              : order,
-          ),
-        )
-        if (!saved) return false
-
-        push(
-          automatic
-            ? 'Pesanan diselesaikan otomatis sesuai pilihan Anda.'
-            : 'Pesanan selesai. Cicilan SPayLater dapat dibayar.',
-          'success',
-        )
-        return true
-      } finally {
+      const completedAt = new Date().toISOString()
+      // Tulis gagal => state tidak berubah (AC-039) dan toast error sudah
+      // dipancarkan oleh handleStorageError. Guard dilepas agar bisa dicoba
+      // lagi. Setelah berhasil guard dipertahankan untuk mencegah klik ganda
+      // memproses penyelesaian yang sama dua kali (AC-009).
+      const saved = setOrders((current) =>
+        current.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                status: 'Selesai',
+                completedAt,
+                autoCompleted: automatic,
+                autoOptIn: false,
+              }
+            : order,
+        ),
+      )
+      if (!saved) {
         completingRef.current.delete(orderId)
+        return false
       }
+
+      push(
+        automatic
+          ? 'Pesanan diselesaikan otomatis sesuai pilihan Anda.'
+          : 'Pesanan selesai. Cicilan SPayLater dapat dibayar.',
+        'success',
+      )
+      return true
     },
     [orders, push, setOrders],
   )
@@ -283,7 +285,7 @@ export default function App() {
     const nextCounter = ticketCounter + 1
     if (!setTicketCounter(nextCounter)) return
 
-    const ticket = `TKT-${new Date().getFullYear()}-${String(nextCounter).padStart(6, '0')}`
+    const ticket = generateTicketNumber(nextCounter)
     const saved = setOrders((current) =>
       current.map((order) =>
         order.id === orderId

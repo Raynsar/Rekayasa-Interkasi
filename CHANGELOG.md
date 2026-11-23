@@ -97,6 +97,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   AC-036–AC-037, AC-039–AC-040. **Belum ada yang ditandai Pass** — keputusan
   Pass/Fail diambil di Phase 5 dengan bukti pengujian.
 
+### Phase 5 — Validation (2026-11-23)
+- Ekstraksi pure functions agar dapat diuji tanpa mengubah perilaku:
+  `services/report.ts` (`validateReportDraft`, `hasReportErrors`, batas
+  1000 karakter & 5MB) dan `services/ticket.ts` (`generateTicketNumber`).
+  `ReportForm` dan `App` kini memakai keduanya.
+- Test otomatis Vitest + Testing Library: **7 file test, 52 kasus, semua lulus**
+  (`unit/price`, `unit/datetime`, `unit/report`, `unit/notifications`,
+  `hooks/hooks`, `components/components`, `integration/integration`).
+  Cakupan mencakup perhitungan harga, rentang & keterlambatan, validasi &
+  tiket laporan, ID notifikasi unik, `usePersistentState`, `useAutoComplete`,
+  `useAdFrequency`, komponen PriceBreakdown/ConfirmModal/ReportForm/
+  AdBanner/FilterTabs, serta integrasi selesaikan pesanan, auto-selesai
+  opt-in, anti-duplikat notifikasi, dan klik ganda konfirmasi.
+- Perbaikan bug yang ditemukan pengujian: guard `completingRef` kini
+  dipertahankan setelah penyelesaian berhasil, sehingga klik ganda
+  tombol konfirmasi hanya menghasilkan satu perubahan status & satu
+  feedback (AC-009). Guard tetap dilepas saat penulisan gagal agar
+  pengguna bisa mencoba lagi (AC-039).
+- Verifikasi runtime headless Chrome dengan bukti tersimpan:
+  **32/32 pemeriksaan AC** di `docs/validation/phase5/runtime-ac.json`
+  dan **8/8 skenario manual wajib** di
+  `docs/validation/phase5/manual-scenarios.json` (selesaikan + konfirmasi,
+  Batal, reload status Selesai, cooldown iklan, tiket + draft terhapus,
+  validasi deskripsi, localStorage gagal, clear storage).
+- Log test: `docs/validation/phase5/vitest.log` (7 file / 52 test passed).
+- Screenshot & audit gaya: `docs/screenshots/phase4-{mobile,tablet,desktop}.png`,
+  `docs/screenshots/phase4-audit.json`, serta 20 screenshot Phase 5
+  (10 route × 390px/1440px) + `docs/screenshots/phase5/audit.json`.
+  Audit: 20/20 route menampilkan konten yang diharapkan dan bebas overflow horizontal;
+  token warna `#ee4d2d`, radius 8px, font Inter, badge status berlabel,
+  dan area sentuh tutup iklan 44×44px terkonfirmasi dari gaya komputasi.
+- **Hasil akhir 42 AC: 42 Pass · 0 Fail · 0 Blocked · 0 Not Tested.**
+  Tidak ada catatan Fail/Blocked. Keterbatasan: screenshot tidak dibaca
+  secara visual oleh agent (model tanpa input gambar), sehingga validasi
+  visual mengandalkan DOM terukur + berkas screenshot tersimpan.
+- `npm run build` sukses setelah perubahan test dan perbaikan guard.
+
 ## [2.0.0] - 2026-11-23
 
 ### Added

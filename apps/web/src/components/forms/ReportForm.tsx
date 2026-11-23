@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { FileText, Paperclip, ShieldCheck } from 'lucide-react'
+import {
+  hasReportErrors,
+  MAX_DESCRIPTION,
+  validateReportDraft,
+} from '../../services/report'
+import type { ReportErrors } from '../../services/report'
 import type { Order, OrderStatus } from '../../types/order'
 import type { ReportDraft } from '../../types/report'
 import StatusBadge from '../orders/StatusBadge'
@@ -13,9 +19,6 @@ const CATEGORIES = [
   'Pesanan dibatalkan',
   'Lainnya',
 ]
-
-const MAX_DESCRIPTION = 1000
-const MAX_EVIDENCE_BYTES = 5 * 1024 * 1024
 
 export function defaultCategory(status: OrderStatus): string {
   switch (status) {
@@ -42,12 +45,6 @@ export function emptyDraft(order: Order): ReportDraft {
   }
 }
 
-interface Errors {
-  category?: string
-  description?: string
-  evidence?: string
-}
-
 interface Props {
   order: Order
   draft: ReportDraft
@@ -57,21 +54,14 @@ interface Props {
 }
 
 export default function ReportForm({ order, draft, onChange, onSubmit, onCancel }: Props) {
-  const [errors, setErrors] = useState<Errors>({})
+  const [errors, setErrors] = useState<ReportErrors>({})
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const nextErrors: Errors = {}
-
-    if (!draft.category) nextErrors.category = 'Kategori wajib dipilih.'
-    if (!draft.description.trim()) nextErrors.description = 'Deskripsi wajib diisi.'
-    else if (draft.description.length > MAX_DESCRIPTION)
-      nextErrors.description = `Deskripsi maksimal ${MAX_DESCRIPTION} karakter.`
-    if (draft.evidenceSize !== undefined && draft.evidenceSize > MAX_EVIDENCE_BYTES)
-      nextErrors.evidence = 'Ukuran bukti maksimal 5MB.'
+    const nextErrors = validateReportDraft(draft)
 
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length > 0) return
+    if (hasReportErrors(nextErrors)) return
 
     onSubmit({ ...draft, description: draft.description.trim() })
   }

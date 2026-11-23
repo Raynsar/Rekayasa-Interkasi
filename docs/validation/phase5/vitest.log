@@ -1,0 +1,9 @@
+﻿
+ RUN  v5.1.1 D:/UMM/Semester 7/Rekayasa Interaksi/Tugas/apps/web
+
+
+ Test Files  7 passed (7)
+      Tests  52 passed (52)
+   Start at  23:08:26
+   Duration  4.17s (environment 62%, setup 27%, tests 5%, transform 3%, import 2%, worker 1%)
+

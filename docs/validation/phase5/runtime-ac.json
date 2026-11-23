@@ -1,0 +1,228 @@
+{
+  "generatedAt": "2026-11-23T16:07:05.953Z",
+  "styleAudit": {
+    "tokenPrimary": "#ee4d2d",
+    "tokenRadiusMd": "8px",
+    "buttonBg": "rgb(238, 77, 45)",
+    "buttonRadius": "8px",
+    "bodyFont": "Inter, system-ui, sans-serif",
+    "headingFont": "Inter, system-ui, sans-serif",
+    "cardStyles": [
+      {
+        "radius": "12px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "radius": "12px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "radius": "12px",
+        "bg": "rgb(255, 255, 255)"
+      },
+      {
+        "radius": "12px",
+        "bg": "rgb(255, 255, 255)"
+      }
+    ]
+  },
+  "perf": {
+    "domContentLoadedMs": 102,
+    "loadEventMs": 103,
+    "responseEndMs": 12
+  },
+  "results": [
+    {
+      "ac": "AC-001",
+      "name": "Harga final identik beranda → produk → checkout",
+      "status": "Pass",
+      "detail": "harapan=Rp47.000 beranda=Rp47.000 produk=true checkout=Rp47.000"
+    },
+    {
+      "ac": "AC-002",
+      "name": "Rincian biaya menampilkan komponen + total",
+      "status": "Pass",
+      "detail": "label=5/5"
+    },
+    {
+      "ac": "AC-003",
+      "name": "Total sama dengan jumlah komponen",
+      "status": "Pass",
+      "detail": "total=47000"
+    },
+    {
+      "ac": "AC-004",
+      "name": "Tombol Selesaikan tersedia di detail Diterima",
+      "status": "Pass",
+      "detail": "{\"text\":\"Selesaikan Pesanan\",\"disabled\":false}"
+    },
+    {
+      "ac": "AC-041",
+      "name": "Paket Diterima (belum diubah) → tombol tersedia",
+      "status": "Pass",
+      "detail": "status=Diterima"
+    },
+    {
+      "ac": "AC-007",
+      "name": "Pengingat 24 jam menawarkan dua pilihan & opt-in tersimpan",
+      "status": "Pass",
+      "detail": "duaPilihan=true optIn=true status=Diterima"
+    },
+    {
+      "ac": "AC-008",
+      "name": "Selesai dalam 2 ketukan",
+      "status": "Pass",
+      "detail": "klik=true/true status=Selesai"
+    },
+    {
+      "ac": "AC-009",
+      "name": "Klik ganda tidak memproses dua kali",
+      "status": "Pass",
+      "detail": "toastSukses=1"
+    },
+    {
+      "ac": "AC-026",
+      "name": "Feedback sukses tampil",
+      "status": "Pass",
+      "detail": "toastSukses=1"
+    },
+    {
+      "ac": "AC-013",
+      "name": "Status konsisten di daftar & detail",
+      "status": "Pass",
+      "detail": "daftar=Selesai detail=Selesai"
+    },
+    {
+      "ac": "AC-010",
+      "name": "Cicilan SPayLater dapat dilunasi setelah Selesai",
+      "status": "Pass",
+      "detail": "tombol=true sisa=0"
+    },
+    {
+      "ac": "AC-011",
+      "name": "Filter status hanya menampilkan status terpilih",
+      "status": "Pass",
+      "detail": "dikirim=true"
+    },
+    {
+      "ac": "AC-012",
+      "name": "Pencarian tetap mengikuti filter aktif",
+      "status": "Pass",
+      "detail": "mouse=true tas=false"
+    },
+    {
+      "ac": "AC-027",
+      "name": "Empty state + aksi tampil saat tidak ada hasil",
+      "status": "Pass",
+      "detail": "pesan=true"
+    },
+    {
+      "ac": "AC-042",
+      "name": "Filter kosong → empty state + Reset Filter berfungsi",
+      "status": "Pass",
+      "detail": "resetBerhasil=true"
+    },
+    {
+      "ac": "AC-015",
+      "name": "Iklan tidak membuka aplikasi tanpa aksi pengguna",
+      "status": "Pass",
+      "detail": "open=0 path=/"
+    },
+    {
+      "ac": "AC-016",
+      "name": "Iklan tidak menghalangi aksi utama",
+      "status": "Pass",
+      "detail": "{\"count\":4,\"reachable\":4,\"overlapsAd\":0}"
+    },
+    {
+      "ac": "AC-014",
+      "name": "Iklan tutup 1 ketukan",
+      "status": "Pass",
+      "detail": "klik=true"
+    },
+    {
+      "ac": "AC-018",
+      "name": "Estimasi pengiriman berbentuk rentang",
+      "status": "Pass",
+      "detail": "estimasi=3–6 hari"
+    },
+    {
+      "ac": "AC-019",
+      "name": "Notifikasi keterlambatan memuat langkah berikutnya",
+      "status": "Pass",
+      "detail": "buka=true jumlah=2 keterlambatan=true langkah=true"
+    },
+    {
+      "ac": "AC-020",
+      "name": "Notifikasi tidak duplikat setelah navigasi ulang",
+      "status": "Pass",
+      "detail": "bell=2→2 deliveries=2→2"
+    },
+    {
+      "ac": "AC-021",
+      "name": "Kegagalan notifikasi dicatat & data pesanan tidak berubah",
+      "status": "Pass",
+      "detail": "buka=true gagalTulis=true dicatat=true status=Dikirim"
+    },
+    {
+      "ac": "AC-023",
+      "name": "ID pesanan & status terlampir otomatis",
+      "status": "Pass",
+      "detail": "lampiran=true"
+    },
+    {
+      "ac": "AC-029",
+      "name": "Error validasi tidak menghapus input lain",
+      "status": "Pass",
+      "detail": "draft=\"Draft harus tetap ada\" error=true"
+    },
+    {
+      "ac": "AC-025",
+      "name": "Navigasi konsisten & menu aktif ditandai",
+      "status": "Pass",
+      "detail": "Pesanan→Beranda"
+    },
+    {
+      "ac": "AC-030",
+      "name": "Warna utama sesuai token #ee4d2d",
+      "status": "Pass",
+      "detail": "{\"token\":\"#ee4d2d\",\"button\":\"rgb(238, 77, 45)\"}"
+    },
+    {
+      "ac": "AC-031",
+      "name": "Tipografi hierarki konsisten (Inter)",
+      "status": "Pass",
+      "detail": "Inter, system-ui, sans-serif / Inter, system-ui, sans-serif"
+    },
+    {
+      "ac": "AC-032",
+      "name": "Gaya komponen konsisten (radius token 8px)",
+      "status": "Pass",
+      "detail": "{\"button\":\"8px\",\"cards\":[{\"radius\":\"12px\",\"bg\":\"rgb(255, 255, 255)\"},{\"radius\":\"12px\",\"bg\":\"rgb(255, 255, 255)\"},{\"radius\":\"12px\",\"bg\":\"rgb(255, 255, 255)\"},{\"radius\":\"12px\",\"bg\":\"rgb(255, 255, 255)\"}]}"
+    },
+    {
+      "ac": "AC-033",
+      "name": "Status punya indikator + label teks konsisten",
+      "status": "Pass",
+      "detail": "badge=7"
+    },
+    {
+      "ac": "AC-038",
+      "name": "Fungsi utama keyboard-accessible & label jelas",
+      "status": "Pass",
+      "detail": "{\"buttons\":7,\"unnamed\":0,\"unlabeled\":0,\"tabs\":6,\"tabsSelected\":6} fokus={\"tag\":\"BUTTON\",\"label\":\"Notifikasi (2)\"}"
+    },
+    {
+      "ac": "AC-035",
+      "name": "Halaman utama tampil ≤ 3 detik",
+      "status": "Pass",
+      "detail": "{\"domContentLoadedMs\":102,\"loadEventMs\":103,\"responseEndMs\":12}"
+    },
+    {
+      "ac": "AC-040",
+      "name": "Perubahan harga menampilkan \"harga diperbarui\" + nilai baru",
+      "status": "Pass",
+      "detail": "banner=true total=Rp50.000"
+    }
+  ]
+}
